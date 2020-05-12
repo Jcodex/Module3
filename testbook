@@ -1,0 +1,48 @@
+---
+- hosts: all,!server1
+  become: yes
+  become_method: sudo
+  tasks:
+    - debug: msg="test"
+
+- hosts: server1
+  become: yes
+  become_method: sudo
+  tasks:
+     
+    - name: Configure all tomcat servers
+      lineinfile:
+        path: /etc/apache2/sites-available/000-default.conf
+        line: "BalancerMember http://{{ item }}:8080"
+        insertafter: <Proxy balancer://mycluster>
+        state: present
+        create: yes     
+      loop: "{{ groups['all'] | map('extract',hostvars,['ansible_eth1','ipv4','address']) | list }}"
+
+
+
+
+
+
+
+#    - name: write all ip in file
+#      lineinfile:
+#        path: /home/test
+#        line: "{{ groups['all'] | map('extract',hostvars,['ansible_eth1','ipv4','address']) | list }}"   
+#        state: present
+#        create: yes
+       #var: hostvars[groups['all'][0]]['ansible_eth1']['ipv4']['address']
+       #msg: "{{ hostvars[groups['all'][0]]['ansible_eth1']['ipv4']['address'] }}"
+
+#   - debug:
+#       msg: "my ip is {{ ansible_facts.eth1.ipv4.address }}"
+#   - debug:
+#       msg: " is {{ groups['all'] }}"
+
+ # msg: " {{ item }} "
+     #loop: "{{ groups['all'] }}"
+
+  #- debug:
+     # msg: " is = {{ groups['all'] }}"
+     # loop: "{{ groups['all'] }}"
+

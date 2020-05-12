@@ -172,17 +172,17 @@
       state: present
       name: ssl
 
-  - name: change port 80 to 443 
-    lineinfile:
-      path: /etc/apache2/sites-available/000-default.conf
-      regexp: ^<VirtualHost \*:80>
-      line: <VirtualHost *:443>
+#  - name: change port 80 to 443 
+#    lineinfile:
+#      path: /etc/apache2/sites-available/000-default.conf
+#      regexp: ^<VirtualHost \*:80>
+#      line: <VirtualHost *:443>
 
   - name: reconfigure default apache site
     blockinfile:
       path: /etc/apache2/sites-available/000-default.conf
       marker: "{mark}"
-      marker_begin: "<VirtualHost *:443>"
+      marker_begin: "<VirtualHost *:80>"
       marker_end: "</VirtualHost>"
       block: |-
         SSLEngine on
@@ -221,7 +221,7 @@
 
   - name: reload apache2
     systemd:
-      state: reloaded
+      state: restarted
       name: apache2
 
 - hosts: server3
